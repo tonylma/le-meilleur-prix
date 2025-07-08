@@ -1,0 +1,53 @@
+{
+  "prices": [
+    {
+      "id": 1,
+      "productName": "Tomate",
+      "price": 500,
+      "unit": "kg",
+      "store": {
+        "type": "Marché",
+        "name": "Marché de Koko"
+      },
+      "location": {
+        "city": "Bouaké",
+        "neighborhood": "Koko"
+      },
+      "pseudo": "Anonyme",
+      "date": "2025-07-06T10:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "productName": "Tomate",
+      "price": 600,
+      "unit": "kg",
+      "store": {
+        "type": "Marché",
+        "name": "Marché Dar-Es-Salam"
+      },
+      "location": {
+        "city": "Bouaké",
+        "neighborhood": "Dar-Es-Salam"
+      },
+      "pseudo": "TontonYao",
+      "date": "2025-07-05T14:30:00.000Z"
+    },
+    {
+        "id": 3,
+        "productName": "Riz",
+        "price": 750,
+        "unit": "kg",
+        "store": {
+          "type": "Supermarché",
+          "name": "Super U"
+        },
+        "location": {
+          "city": "Abidjan",
+          "neighborhood": "Cocody"
+        },
+        "pseudo": "Marie",
+        "date": "2025-07-07T18:00:00.000Z"
+    }
+  ],
+  "reports": []
+}
