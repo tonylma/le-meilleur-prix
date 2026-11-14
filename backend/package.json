@@ -1,11 +1,12 @@
 {
   "name": "le-meilleur-prix-backend",
-  "version": "1.0.0",
-  "description": "API pour Le Meilleur Prix",
+  "version": "1.1.0",
+  "description": "API sécurisée pour Le Meilleur Prix",
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
   "dependencies": {
     "cors": "^2.8.5",

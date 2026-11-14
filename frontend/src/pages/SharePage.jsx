@@ -1,109 +1,48 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const initialForm = { productName: '', price: '', unit: 'kg', storeType: 'Marché', storeName: '', city: '', neighborhood: '', pseudo: '' };
+
 const SharePage = ({ apiUrl }) => {
-  const [formData, setFormData] = useState({
-    productName: '', price: '', unit: 'kg', storeType: 'Marché',
-    storeName: '', city: 'Bouaké', neighborhood: '', pseudo: ''
-  });
+  const [formData, setFormData] = useState(initialForm);
   const [message, setMessage] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+  const handleChange = event => setFormData(previous => ({ ...previous, [event.target.name]: event.target.value }));
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setMessage({ type: 'info', text: 'Envoi en cours...' });
-
+  const handleSubmit = async event => {
+    event.preventDefault();
+    setSubmitting(true);
+    setMessage(null);
     const submission = {
-      productName: formData.productName,
-      price: parseFloat(formData.price),
-      unit: formData.unit,
-      store: {
-        type: formData.storeType,
-        name: formData.storeName,
-      },
-      location: {
-        city: formData.city,
-        neighborhood: formData.neighborhood,
-      },
-      pseudo: formData.pseudo,
+      productName: formData.productName.trim(), price: Number(formData.price), unit: formData.unit,
+      store: { type: formData.storeType, name: formData.storeName.trim() },
+      location: { city: formData.city.trim(), neighborhood: formData.neighborhood.trim() },
+      pseudo: formData.pseudo.trim(),
     };
-
-    fetch(`${apiUrl}/prices`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(submission)
-    })
-    .then(res => {
-        if (!res.ok) {
-            return res.json().then(err => { throw new Error(err.message) });
-        }
-        return res.json();
-    })
-    .then(data => {
-      setMessage({ type: 'success', text: 'Merci ! Votre prix a bien été ajouté.' });
-      setTimeout(() => navigate('/'), 2000);
-    })
-    .catch(err => {
-      setMessage({ type: 'error', text: `Erreur : ${err.message}` });
-    });
+    try {
+      const response = await fetch(`${apiUrl}/prices`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(submission) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'Impossible d’enregistrer ce prix.');
+      setMessage({ type: 'success', text: 'Merci ! Votre prix a bien été partagé.' });
+      window.setTimeout(() => navigate('/rechercher?produit=' + encodeURIComponent(submission.productName)), 900);
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message || 'Une erreur est survenue. Réessayez.' });
+    } finally { setSubmitting(false); }
   };
 
-  return (
-    <div>
-      <h1>Partager un prix 📢</h1>
-      <p>Votre contribution est précieuse. Remplissez ce formulaire simple pour aider la communauté.</p>
-      
-      <form onSubmit={handleSubmit} style={{ maxWidth: '600px', margin: '2rem auto' }}>
-        <div className="form-group">
-          <label>Nom du produit *</label>
-          <input type="text" name="productName" value={formData.productName} onChange={handleChange} className="form-control" required />
-        </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-            <div className="form-group" style={{flex: 2}}>
-                <label>Prix (en F CFA) *</label>
-                <input type="number" name="price" value={formData.price} onChange={handleChange} className="form-control" required />
-            </div>
-            <div className="form-group" style={{flex: 1}}>
-                <label>Unité *</label>
-                <select name="unit" value={formData.unit} onChange={handleChange} className="form-control" required>
-                    <option value="kg">kg</option>
-                    <option value="litre">litre</option>
-                    <option value="pièce">pièce</option>
-                    <option value="botte">botte</option>
-                </select>
-            </div>
-        </div>
-        {/* ... Autres champs ... */}
-        <div className="form-group">
-            <label>Ville *</label>
-            <input type="text" name="city" value={formData.city} onChange={handleChange} className="form-control" required/>
-        </div>
-        <div className="form-group">
-            <label>Pseudonyme (facultatif)</label>
-            <input type="text" name="pseudo" value={formData.pseudo} onChange={handleChange} className="form-control" />
-        </div>
-        
-        <button type="submit" className="btn" style={{ width: '100%' }}>Envoyer le prix</button>
-
-        {message && (
-          <p style={{ 
-            marginTop: '1rem', 
-            padding: '1rem', 
-            borderRadius: '8px',
-            backgroundColor: message.type === 'success' ? '#d4edda' : '#f8d7da',
-            color: message.type === 'success' ? '#155724' : '#721c24'
-          }}>
-            {message.text}
-          </p>
-        )}
-      </form>
-    </div>
-  );
+  return <section className="share-page">
+    <div className="page-heading"><p className="eyebrow">Ensemble, mieux informés</p><h1>Partager un prix</h1><p>Un relevé récent aide les autres à comparer. Les champs marqués d’un * sont requis.</p></div>
+    <form onSubmit={handleSubmit} className="share-form">
+      <div className="form-group"><label htmlFor="productName">Nom du produit *</label><input id="productName" name="productName" value={formData.productName} onChange={handleChange} className="form-control" autoComplete="off" required maxLength="80" /></div>
+      <div className="form-row"><div className="form-group"><label htmlFor="price">Prix (F CFA) *</label><input id="price" name="price" type="number" min="1" max="1000000000" step="1" value={formData.price} onChange={handleChange} className="form-control" required /></div><div className="form-group"><label htmlFor="unit">Unité *</label><select id="unit" name="unit" value={formData.unit} onChange={handleChange} className="form-control"><option>kg</option><option>litre</option><option>pièce</option><option>botte</option><option>sac</option></select></div></div>
+      <div className="form-row"><div className="form-group"><label htmlFor="storeType">Type de commerce *</label><select id="storeType" name="storeType" value={formData.storeType} onChange={handleChange} className="form-control"><option>Marché</option><option>Supermarché</option><option>Boutique</option><option>Autre</option></select></div><div className="form-group"><label htmlFor="storeName">Nom du commerce *</label><input id="storeName" name="storeName" value={formData.storeName} onChange={handleChange} className="form-control" required maxLength="100" /></div></div>
+      <div className="form-row"><div className="form-group"><label htmlFor="city">Ville *</label><input id="city" name="city" value={formData.city} onChange={handleChange} className="form-control" required maxLength="80" autoComplete="address-level2" /></div><div className="form-group"><label htmlFor="neighborhood">Quartier</label><input id="neighborhood" name="neighborhood" value={formData.neighborhood} onChange={handleChange} className="form-control" maxLength="80" /></div></div>
+      <div className="form-group"><label htmlFor="pseudo">Pseudonyme (facultatif)</label><input id="pseudo" name="pseudo" value={formData.pseudo} onChange={handleChange} className="form-control" maxLength="40" autoComplete="nickname" /></div>
+      <button type="submit" className="btn submit-button" disabled={submitting}>{submitting ? 'Envoi en cours…' : 'Partager ce prix'}</button>
+      {message && <p className={`status-message ${message.type}`} role={message.type === 'error' ? 'alert' : 'status'}>{message.text}</p>}
+    </form>
+  </section>;
 };
 
 export default SharePage;

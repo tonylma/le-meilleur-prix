@@ -7,7 +7,7 @@ import SharePage from './pages/SharePage';
 import StatsPage from './pages/StatsPage';
 import AboutPage from './pages/AboutPage';
 
-const API_URL = 'http://localhost:3001/api';
+const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
 function App() {
   return (
@@ -19,6 +19,7 @@ function App() {
           <Route path="partager" element={<SharePage apiUrl={API_URL} />} />
           <Route path="statistiques" element={<StatsPage apiUrl={API_URL} />} />
           <Route path="a-propos" element={<AboutPage />} />
+          <Route path="*" element={<div className="empty-state"><h1>Page introuvable</h1><p>Cette adresse n’existe pas.</p><a className="btn" href="/">Retour à l’accueil</a></div>} />
         </Route>
       </Routes>
     </Router>
