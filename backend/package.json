@@ -1,15 +1,9 @@
 {
   "name": "le-meilleur-prix-backend",
-  "version": "1.1.0",
-  "description": "API sécurisée pour Le Meilleur Prix",
+  "version": "2.0.0",
+  "description": "API de comparaison de prix avec PostgreSQL, authentification et modération",
   "main": "server.js",
   "type": "module",
-  "scripts": {
-    "start": "node server.js",
-    "test": "node --test"
-  },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.19.2"
-  }
+  "scripts": { "start": "node server.js", "test": "node --test" },
+  "dependencies": { "cors": "^2.8.5", "express": "^4.19.2", "pg": "^8.13.1" }
 }
